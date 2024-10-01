@@ -1,8 +1,8 @@
 ########################################
 # Name: Flannery Sheets
-# Collaborators (if any): Gavin Smith!!!
+# Collaborators (if any): Gavin Smith and Emma from the QUAD
 # GenAI Transcript (if any): No
-# Estimated time spent (hr): 5
+# Estimated time spent (hr): 8
 # Description of any added extensions: No
 ########################################
 
@@ -12,88 +12,66 @@ import random
 
 def wordle():
 
-    def enter_action():
-        guess = word_from_row(0)
-        row = gw.get_current_row()
-        print(guess)
+    def enter_action(): #when enter is pressed
+        guess = word_from_row(0) #guess is equal to whatever is written in row
+        row = gw.get_current_row() #get the row
         if guess.lower() in ENGLISH_WORDS:
-            gw.show_message('Good Job!')
-            color_row(row,answer,guess)
-            
+            gw.show_message('Good Job!') #if english word prints message
+            color_row(row,answer,guess) #colors row (checks row)
         else:
-            gw.show_message('not word in list')
+            gw.show_message('not word in list') #if not english word
 
-    def word_to_row(row:int, word:str):
-        gw.show_message("words")
-
-    def set_row(guess):
-        row = gw.get_current_row()
-        if answer == guess:
-            gw.show_message("way to go buddy!")
-            gw.set_current_row(N_ROWS)
-        elif row == N_ROWS - 1:
-            gw.show_message("you lost, the answer was " + answer)
+    def set_row(guess): #function for when to end or first time win
+        row = gw.get_current_row() #finds whatever the current row is
+        if answer == guess: #if they are exactly the same
+            gw.show_message("way to go buddy!") #prints message
+            gw.set_current_row(N_ROWS) #ends the game
+        elif row == N_ROWS - 1: #if all rows are filled
+            gw.show_message("you lost, the answer was " + answer) #if answer is never reached
         else:
-            gw.set_current_row(row+1)
+            gw.set_current_row(row+1) #moves on to next row
 
-    def word_from_row(row:int) -> str:
+    def word_from_row(row:int) -> str: #shows that the guess is what is typed in the row
         string = gw.get_square_letter(row,0) + gw.get_square_letter(row,1) + gw.get_square_letter(row,2) + gw.get_square_letter(row,3) + gw.get_square_letter(row,4)
-        print(type (string))
         return string
     
     def color_row(row:int,answer:str,guess:str):
         guess = word_from_row(row).lower()
         unmatched = answer
-        
-        print(len(unmatched))
-        for i in range(len(guess)):
-            if unmatched[i] == guess[i]:
-                gw.set_square_color(row,i,CORRECT_COLOR)
-                gw.set_key_color(guess[i],CORRECT_COLOR)
-                #unmatched = remaining_letters(i,answer)
-                unmatched = unmatched[:i] + "-" + unmatched[i+1:]
-                print(unmatched)
+        for i in range(len(guess)): #in the first row, the guess
+            if unmatched[i] == guess[i]: #if the answer and guess match, then green
+                gw.set_square_color(row,i,CORRECT_COLOR) #letter green
+                gw.set_key_color(guess[i],CORRECT_COLOR) #key green
+                unmatched = unmatched[:i] + "-" + unmatched[i+1:] #removes correct letter from unmatched
         for i in range(len(guess)):    
-            if guess[i] in unmatched:
-                color = gw.get_square_color(row,i)
-                if color != CORRECT_COLOR:
-                    gw.set_square_color(row,i,PRESENT_COLOR)
-                    color = gw.get_key_color(guess[i])
-                    if color != CORRECT_COLOR:
-                        gw.set_key_color(guess[i],PRESENT_COLOR)
-                    #unmatched = remaining_letters(i,answer)
-                    unmatched = unmatched.replace(guess[i],"-",1)
+            if guess[i] in unmatched: #if letter correspond
+                color = gw.get_square_color(row,i) #color is the square color
+                if color != CORRECT_COLOR: #if the color isnt green
+                    gw.set_square_color(row,i,PRESENT_COLOR) # make the color yellow
+                    color = gw.get_key_color(guess[i]) # color is equal to the color
+                    if color != CORRECT_COLOR: # if color isnt green
+                        gw.set_key_color(guess[i],PRESENT_COLOR) # make the key yellow
+                    unmatched = unmatched.replace(guess[i],"-",1) #continuing to replace letters in unmatched so that the function can function
             else:
-                color = gw.get_square_color(row,i)
-                if color == UNKNOWN_COLOR:
-                    gw.set_square_color(row,i,MISSING_COLOR)
-                    colorb = gw.get_key_color(guess[i])
-                    if colorb == UNKNOWN_COLOR:    
-                        gw.set_key_color(guess[i],MISSING_COLOR)
-        set_row(guess)
-    
-    def remaining_letters(letter:str, answer:str) -> str:
-    # remove ONLY THE FIRST case of letter in word
-        for index in range(len(answer)):
-            if answer[index] == letter:
-                return answer[:index] + '-' + answer[index+1:]
-        return answer # if letter isn't present
-    
-    def random_fiveletter_word() -> str: 
-        random.shuffle(ENGLISH_WORDS)
-        for word in ENGLISH_WORDS:
-            if len(word) == 5:
-                return word
+                color = gw.get_square_color(row,i) #color = whatever the color is
+                if color == UNKNOWN_COLOR: # if its white
+                    gw.set_square_color(row,i,MISSING_COLOR) #turn it to gray
+                    colorb = gw.get_key_color(guess[i]) # but
+                    if colorb == UNKNOWN_COLOR: # if the key is already a color   
+                        gw.set_key_color(guess[i],MISSING_COLOR) # dont change it
+        set_row(guess) # set the row so the game can continue
+
+    def random_fiveletter_word() -> str: #sets the answer
+        random.shuffle(ENGLISH_WORDS) #randomly pick an english word
+        for word in ENGLISH_WORDS: #if that word
+            if len(word) == 5: #is five characters
+                return word #then return it
 
 
 
     gw = WordleGWindow()
-
     gw.add_enter_listener(enter_action)
-
-    
-    answer = random_fiveletter_word()
-    gw.show_message(answer)
+    answer = random_fiveletter_word() #sets the answer
 
 
 
